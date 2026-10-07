@@ -93,4 +93,23 @@ class RunnerTestCase(TransactionTestCase):
             # Ensure call_command was invoked EXACTLY ONCE
             self.assertEqual(mock_call_cmd.call_count, 1)
 
+    @patch("django_pmc.runner.call_command")
+    def test_cron_expression_scheduling(self, mock_call_cmd):
+        """
+        Verify that 5-field cron syntax ('cron': '0 3 * * *') calculates next_lock_time and runs correctly.
+        """
+        test_cron_tasks = {
+            "cron_job": {
+                "command": "clearsessions",
+                "cron": "0 3 * * *",  # 3:00 AM every day
+            }
+        }
+        with override_settings(CRON_TASKS=test_cron_tasks):
+            run_scheduled_tasks()
+
+            mock_call_cmd.assert_called_once_with("clearsessions")
+            lock = TaskLock.objects.get(name="cron_job")
+            self.assertGreater(lock.locked_until, timezone.now())
+
+
 

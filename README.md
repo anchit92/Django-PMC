@@ -30,20 +30,25 @@ INSTALLED_APPS = [
 
 ### 2. Configure Scheduled Tasks (`CRON_TASKS`)
 
-In `settings.py`, define your schedule dictionary:
+In `settings.py`, define your schedule dictionary. You can use standard **5-field cron syntax** (via `cron`) or **intervals in seconds** (via `interval_seconds`):
 
 ```python
 CRON_TASKS = {
-    'clear_expired_sessions': {
-        'command': 'clearsessions',
-        'interval_seconds': 3600,  # Run once every hour
+    'daily_db_backup': {
+        'command': 'backup_database',
+        'cron': '0 3 * * *',          # Runs every day at 3:00 AM
     },
-    'send_daily_digest': {
-        'command': 'send_email_digest',
-        'interval_seconds': 86400, # Run once every 24 hours
+    'hourly_session_cleanup': {
+        'command': 'clearsessions',
+        'cron': '0 * * * *',          # Runs at minute 0 of every hour
+    },
+    'frequent_sync': {
+        'command': 'sync_external_api',
+        'interval_seconds': 300,      # Runs every 5 minutes (300s)
     },
 }
 ```
+
 
 ### 3. Wire Up URL Routing
 
