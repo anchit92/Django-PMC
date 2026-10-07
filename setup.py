@@ -7,5 +7,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "django>=3.2",
+        "croniter>=1.0.0",
     ],
 )
+
